@@ -1,0 +1,11 @@
+---
+- name: Stop and disable apparmor service
+  ansible.builtin.service:
+    name: apparmor
+    state: stopped
+    enabled: False
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Disable UFW
+  community.general.ufw:
+    state: disabled
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

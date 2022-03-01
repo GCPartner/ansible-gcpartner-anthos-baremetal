@@ -1,0 +1,11 @@
+---
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: Stop and disable firewalld service
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: False
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
