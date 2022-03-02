@@ -3,9 +3,9 @@
   ansible.builtin.apt:
     update_cache: yes
     pkg:
-    - apt-transport-https
-    - ca-certificates
-    - gnupg
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - name: Add Google Cloud Apt signing key to a specific keyring file
   ansible.builtin.apt_key:
@@ -22,5 +22,5 @@
     update_cache: yes
     cache_valid_time: 3600
     pkg:
-    - google-cloud-sdk
+      - google-cloud-sdk
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
