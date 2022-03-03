@@ -1,4 +1,9 @@
 ---
+#
+#- name: Set facts
+#  set_fact:
+#    cp_vip: {{ private_subnet | ansible.netcommon.ipaddr('-1') }}
+
 - import_playbook: rhel.yaml
 - import_playbook: ubuntu.yaml
 - name: Download bmctl
