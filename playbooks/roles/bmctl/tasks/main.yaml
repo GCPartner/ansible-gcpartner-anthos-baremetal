@@ -4,8 +4,8 @@
 #  set_fact:
 #    cp_vip: {{ private_subnet | ansible.netcommon.ipaddr('-1') }}
 
-- import_playbook: rhel.yaml
-- import_playbook: ubuntu.yaml
+- import_tasks: rhel.yaml
+- import_tasks: ubuntu.yaml
 - name: Download bmctl
   community.google.gc_storage:
     bucket: anthos-baremetal-release/bmctl/"{{ bmctl_version }}"/linux-amd64/
