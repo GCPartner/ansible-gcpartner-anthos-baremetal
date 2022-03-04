@@ -1,25 +1,33 @@
 ---
-#
-#- name: Set facts
-#  set_fact:
-#    cp_vip: {{ private_subnet | ansible.netcommon.ipaddr('-1') }}
+- name: Set facts
+  set_fact:
+    cp_vip: "{{ private_subnet | ansible.netcommon.ipaddr('-2') }}"
+
+- name: Print the gateway for each host when defined
+  ansible.builtin.debug:
+    msg: cp_vip is  {{ cp_vip }}
+
+- name: bmctl key
+  set_fact:
+    bmctl_key: "{{ lookup('file', '/home/ubuntu/bootstrap/gcp_keys/bmctl.json') | from_json }}"
 
 - import_tasks: rhel.yaml
 - import_tasks: ubuntu.yaml
+
 - name: Download bmctl
-  community.google.gc_storage:
-    bucket: anthos-baremetal-release/bmctl/"{{ bmctl_version }}"/linux-amd64/
-    object: bmctl
-    dest: $HOME/bootstrap/bmctl
-    mode: get
-  environment:
-    GOOGLE_APPLICATION_CREDENTIALS: $HOME/bootstrap/gcp_keys/bmctl.json
+  ansible.builtin.shell:
+    chdir: "{{ home_path }}/bootstrap"
+    cmd: "gcloud auth activate-service-account --key-file={{ home_path }}/bootstrap/gcp_keys/gcr.json && gsutil cp gs://anthos-baremetal-release/bmctl/{{ bmctl_version }}/linux-amd64/bmctl ."
+    creates: "{{ home_path }}/bootstrap/bmctl"
+
 - name: Change bmctl permissions
   ansible.builtin.file:
-    path: $HOME/bootstrap/bmctl
+    path: "{{ home_path }}/bootstrap/bmctl"
     mode: '0755'
 - name: Create cluster config
   ansible.builtin.shell:
-    chdir: $HOME/bootstrap
-    cmd: $HOME/bootstrap/bmctl create config -c {{ cluster_name }} --enable-apis --create-service-accounts --project-id={{ gcp_project_id }}
-    creates: bmctl-workspace/{{ cluster_name }}/{{ cluster_name }}.yaml
+    chdir: "{{ home_path }}/bootstrap"
+    cmd: "{{ home_path }}/bootstrap/bmctl create config -c {{ cluster_name }} --project-id={{ gcp_project_id }}"
+    creates: "{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name }}.yaml"
+  environment:
+    GOOGLE_APPLICATION_CREDENTIALS: "{{ home_path }}/bootstrap/gcp_keys/bmctl.json"
