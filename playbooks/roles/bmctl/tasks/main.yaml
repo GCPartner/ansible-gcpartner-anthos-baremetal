@@ -1,4 +1,3 @@
----
 - name: Set facts cp_vip
   set_fact:
     cp_vip: "{{ private_subnet | ansible.netcommon.nthhost('-2')}}"
@@ -22,8 +21,8 @@
 
 - name: bmctl key
   set_fact:
-    bmctl_key: "{{ lookup('file', '/home/ubuntu/bootstrap/gcp_keys/bmctl.json') |\
-      \ from_json }}"
+    bmctl_key: "{{ lookup('file', '{{ home_path }}/bootstrap/gcp_keys/bmctl.json')\
+      \ | from_json }}"
 
 - import_tasks: rhel.yaml
 - import_tasks: ubuntu.yaml
