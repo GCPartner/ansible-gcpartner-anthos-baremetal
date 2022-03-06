@@ -1,33 +1,51 @@
 ---
-- name: Set facts
+- name: Set facts cp_vip
   set_fact:
-    cp_vip: "{{ private_subnet | ansible.netcommon.ipaddr('-2') }}"
+    cp_vip: "{{ private_subnet | ansible.netcommon.nthhost('-2')}}"
 
-- name: Print the gateway for each host when defined
+- name: Set facts ingress_vip
+  set_fact:
+    ingress_vip: "{{ private_subnet | ansible.netcommon.nthhost('-3')}}"
+
+- name: Set facts lb_range_start
+  set_fact:
+    lb_range_start: "{{ private_subnet | ansible.netcommon.nthhost('-14')}}"
+
+- name: Set facts lb_range_end
+  set_fact:
+    lb_range_end: "{{ private_subnet | ansible.netcommon.nthhost('-4')}}"
+
+- name: Print the cp_vip ingress_vip lb_range_start lb_range_end
   ansible.builtin.debug:
-    msg: cp_vip is  {{ cp_vip }}
+    msg: The 4 ips are  {{ cp_vip }} {{ ingress_vip}} {{lb_range_start}} {{lb_range_end
+      }}
 
 - name: bmctl key
   set_fact:
-    bmctl_key: "{{ lookup('file', '/home/ubuntu/bootstrap/gcp_keys/bmctl.json') | from_json }}"
+    bmctl_key: "{{ lookup('file', '/home/ubuntu/bootstrap/gcp_keys/bmctl.json') |\
+      \ from_json }}"
 
 - import_tasks: rhel.yaml
 - import_tasks: ubuntu.yaml
 
 - name: Download bmctl
   ansible.builtin.shell:
-    chdir: "{{ home_path }}/bootstrap"
-    cmd: "gcloud auth activate-service-account --key-file={{ home_path }}/bootstrap/gcp_keys/gcr.json && gsutil cp gs://anthos-baremetal-release/bmctl/{{ bmctl_version }}/linux-amd64/bmctl ."
-    creates: "{{ home_path }}/bootstrap/bmctl"
+    chdir: '{{ home_path }}/bootstrap'
+    cmd: gcloud auth activate-service-account --key-file={{ home_path }}/bootstrap/gcp_keys/gcr.json
+      && gsutil cp gs://anthos-baremetal-release/bmctl/{{ bmctl_version }}/linux-amd64/bmctl
+      .
+    creates: '{{ home_path }}/bootstrap/bmctl'
 
 - name: Change bmctl permissions
   ansible.builtin.file:
-    path: "{{ home_path }}/bootstrap/bmctl"
+    path: '{{ home_path }}/bootstrap/bmctl'
     mode: '0755'
 - name: Create cluster config
   ansible.builtin.shell:
-    chdir: "{{ home_path }}/bootstrap"
-    cmd: "{{ home_path }}/bootstrap/bmctl create config -c {{ cluster_name }} --project-id={{ gcp_project_id }}"
-    creates: "{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name }}.yaml"
+    chdir: '{{ home_path }}/bootstrap'
+    cmd: '{{ home_path }}/bootstrap/bmctl create config -c {{ cluster_name }} --project-id={{
+      gcp_project_id }}'
+    creates: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
+      }}.yaml'
   environment:
-    GOOGLE_APPLICATION_CREDENTIALS: "{{ home_path }}/bootstrap/gcp_keys/bmctl.json"
+    GOOGLE_APPLICATION_CREDENTIALS: '{{ home_path }}/bootstrap/gcp_keys/bmctl.json'
