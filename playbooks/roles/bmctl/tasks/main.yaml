@@ -60,3 +60,11 @@
       }}/bootstrap/gcp_keys/connect.json', gkeConnectRegisterServiceAccountKeyPath: '{{
       home_path }}/bootstrap/gcp_keys/register.json', cloudOperationsServiceAccountKeyPath: '{{
       home_path }}/bootstrap/gcp_keys/cloud-ops.json'}
+
+- name: Replace controlPlaneVIP
+  replace:
+    path: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
+      }}.yaml'
+    regexp: 'controlPlaneVIP: .*'
+    replace: 'controlPlaneVIP: {{ cp_vip }}'
+    backup: yes
