@@ -3,9 +3,9 @@
   ansible.builtin.apt:
     update_cache: yes
     pkg:
-      - apt-transport-https
-      - ca-certificates
-      - gnupg
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - name: Add Google Cloud Apt signing key to a specific keyring file
   ansible.builtin.apt_key:
@@ -14,7 +14,8 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - name: Add Google Cloud repository into sources list
   ansible.builtin.apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main
+    repo: deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt
+      cloud-sdk main
     state: present
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - name: Install Google Cloud SDK
@@ -22,5 +23,35 @@
     update_cache: yes
     cache_valid_time: 3600
     pkg:
-      - google-cloud-sdk
+    - google-cloud-sdk
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+# docker install
+- name: Install Docker prerequisites
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+    - curl
+    - software-properties-common
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add an Apt signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add docker repository into sources list
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Install docker
+  ansible.builtin.shell: |
+    DOCKER_VERSION=$(sudo apt-cache madison docker-ce | grep '19.03.13' | awk '{print $3}')
+    DOCKER_CLI_VERSION=$(sudo apt-cache madison docker-ce-cli | grep '19.03.13' | awk '{print $3}')
+    sudo apt-get install docker-ce=$DOCKER_VERSION docker-ce-cli=$DOCKER_CLI_VERSION -qy
+    sudo usermod -aG docker $USER

@@ -7,23 +7,25 @@ cloudOperationsServiceAccountKeyPath: '{{ home_path }}/bootstrap/gcp_keys/cloud-
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: cluster-{{cluster_name}}
+  name: cluster-{{ cluster_name }}
 ---
 apiVersion: baremetal.cluster.gke.io/v1
 kind: Cluster
 metadata:
-  name: {{cluster_name}}
-  namespace: cluster-{{cluster_name}}
+  name: {{ cluster_name }}
+  namespace: cluster-{{ cluster_name }}
 spec:
   type: hybrid
   profile: default
   anthosBareMetalVersion: 1.10.2
   gkeConnect:
-    projectID: {{gcp_project_id}}
+    projectID: {{ gcp_project_id }}
   controlPlane:
     nodePoolSpec:
       nodes:
-      - address: <Machine 1 IP>
+{% for n in range(cp_node_count) %}
+      - address: {{ private_subnet | ansible.netcommon.nthhost(n+1) }}
+{% endfor %}
   clusterNetwork:
     pods:
       cidrBlocks:
@@ -36,14 +38,14 @@ spec:
     ports:
       controlPlaneLBPort: 443
     vips:
-      controlPlaneVIP: {{cp_vip}}
-      ingressVIP: {{ingress_vip}}
+      controlPlaneVIP: {{ cp_vip }}
+      ingressVIP: {{ ingress_vip }}
     addressPools:
     - name: pool1
       addresses:
-      - 'vip_pool_start-ingress_vip'
+      - {{ lb_range_start }}-{{ ingress_vip }}
   clusterOperations:
-    projectID: wwt-terraform {{ gcp_project_id }}
+    projectID: {{ gcp_project_id }}
     location: us-central1
   storage:
     lvpNodeMounts:
@@ -58,16 +60,16 @@ spec:
       maxPodsPerNode: 250
     containerRuntime: containerd
   nodeAccess:
-    loginUser: '<login user name> user_name' # use terraform to create user_name
+    loginUser: {{ username }}
 ---
 apiVersion: baremetal.cluster.gke.io/v1
 kind: NodePool
 metadata:
   name: node-pool-1
-  namespace: cluster-{{cluster_name}}
+  namespace: cluster-{{ cluster_name }}
 spec:
-  clusterName: {{cluster_name}}
+  clusterName: {{ cluster_name }}
   nodes:
-  - 'jinja_loop with worker node IPs, index 4 }}' # terraform variable for number of controlPlane nodes and number of worker nodes
-  - address: <Machine 2 IP>
-  - address: <Machine 3 IP>
+{% for n in range(worker_node_count) %}
+  - address: {{ private_subnet | ansible.netcommon.nthhost(n+4) }}
+{% endfor %}

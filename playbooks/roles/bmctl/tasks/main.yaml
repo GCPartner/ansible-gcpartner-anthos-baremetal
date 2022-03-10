@@ -1,18 +1,8 @@
 - name: Set facts cp_vip
   set_fact:
     cp_vip: "{{ private_subnet | ansible.netcommon.nthhost('-2')}}"
-
-- name: Set facts ingress_vip
-  set_fact:
     ingress_vip: "{{ private_subnet | ansible.netcommon.nthhost('-3')}}"
-
-- name: Set facts lb_range_start
-  set_fact:
     lb_range_start: "{{ private_subnet | ansible.netcommon.nthhost('-14')}}"
-
-- name: Set facts lb_range_end
-  set_fact:
-    lb_range_end: "{{ private_subnet | ansible.netcommon.nthhost('-4')}}"
 
 - name: Print the cp_vip ingress_vip lb_range_start lb_range_end
   ansible.builtin.debug:
@@ -54,3 +44,13 @@
     src: bmctl.conf.j2
     dest: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
       }}.yaml'
+
+# task to create
+- name: Create cluster
+  ansible.builtin.shell:
+    chdir: '{{ home_path }}/bootstrap'
+    cmd: '{{ home_path }}/bootstrap/bmctl create cluster -c {{ cluster_name }}'
+    creates: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
+      }}-kubeconfig'
+  environment:
+    GOOGLE_APPLICATION_CREDENTIALS: '{{ home_path }}/bootstrap/gcp_keys/bmctl.json'
