@@ -44,8 +44,26 @@
 - name: Create cluster
   ansible.builtin.shell:
     chdir: '{{ home_path }}/bootstrap'
-    cmd: '{{ home_path }}/bootstrap/bmctl create cluster -c {{ cluster_name }}'
+    cmd: '{{ home_path }}/bootstrap/bmctl create cluster -c {{ cluster_name }} &>
+      {{ home_path }}/bootstrap/cluster_create.log'
     creates: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
       }}-kubeconfig'
   environment:
     GOOGLE_APPLICATION_CREDENTIALS: '{{ home_path }}/bootstrap/gcp_keys/bmctl.json'
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: '{{ home_path }}/.kube'
+    state: directory
+    mode: '0755'
+    group: '{{ username }}'
+    owner: '{{ username }}'
+
+- name: Copy kubeconfig to ~/.kube
+  ansible.builtin.copy:
+    src: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
+      }}-kubeconfig'
+    dest: '{{ home_path }}/.kube/config'
+    owner: '{{ username }}'
+    group: '{{ username }}'
+    mode: '0644'
