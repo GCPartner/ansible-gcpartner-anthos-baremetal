@@ -49,9 +49,23 @@
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
     state: present
 
-- name: Install docker
-  ansible.builtin.shell: |
-    DOCKER_VERSION=$(sudo apt-cache madison docker-ce | grep '19.03.13' | awk '{print $3}')
-    DOCKER_CLI_VERSION=$(sudo apt-cache madison docker-ce-cli | grep '19.03.13' | awk '{print $3}')
-    sudo apt-get install docker-ce=$DOCKER_VERSION docker-ce-cli=$DOCKER_CLI_VERSION -qy
-    sudo usermod -aG docker $USER
+- name: Install docker-ce and docker-cli
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - docker-ce={{ docker_ce_version }}
+    - docker-ce-cli={{ docker_ce_cli_version }}
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add ubuntu user to docker
+  ansible.builtin.user:
+    name: '{{ username }}'
+    groups:
+    - docker
+    append: yes
+
+- name: Download kubectl
+  get_url:
+    url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
