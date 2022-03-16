@@ -48,6 +48,7 @@
       {{ home_path }}/bootstrap/cluster_create.log'
     creates: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
       }}-kubeconfig'
+    executable: /bin/bash
   environment:
     GOOGLE_APPLICATION_CREDENTIALS: '{{ home_path }}/bootstrap/gcp_keys/bmctl.json'
 
