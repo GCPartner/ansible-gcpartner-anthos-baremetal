@@ -48,6 +48,7 @@
   ansible.builtin.apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
     state: present
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Install docker-ce and docker-cli
   ansible.builtin.apt:
