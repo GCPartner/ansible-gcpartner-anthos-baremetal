@@ -54,8 +54,8 @@
   ansible.builtin.apt:
     update_cache: yes
     pkg:
-    - docker-ce={{ docker_ce_version }}
-    - docker-ce-cli={{ docker_ce_cli_version }}
+    - docker-ce={{ ubuntu_docker_ce_version }}
+    - docker-ce-cli={{ ubuntu_docker_ce_cli_version }}
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Add ubuntu user to docker
@@ -64,6 +64,7 @@
     groups:
     - docker
     append: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Download kubectl
   get_url:
