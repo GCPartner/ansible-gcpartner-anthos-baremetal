@@ -20,6 +20,18 @@
       .
     creates: '{{ home_path }}/bootstrap/bmctl'
 
+- name: Download kubectl
+  get_url:
+    url: https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Enable service docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
 - name: Change bmctl permissions
   ansible.builtin.file:
     path: '{{ home_path }}/bootstrap/bmctl'
