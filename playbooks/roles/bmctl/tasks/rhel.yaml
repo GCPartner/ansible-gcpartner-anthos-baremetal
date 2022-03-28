@@ -8,8 +8,7 @@
     gpgkey:
     - https://packages.cloud.google.com/yum/doc/yum-key.gpg
     - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 
 # Using https://docs.docker.com/engine/install/centos/
@@ -25,24 +24,21 @@
     - docker-logrotate
     - docker-engine
     state: absent
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Add yum-utils
   ansible.builtin.yum:
     name:
     - yum-utils
     state: present
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Add Docker-ce repo
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docer-ce.repo
   become: yes
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Install docker-ce/cli
   ansible.builtin.yum:
@@ -50,8 +46,7 @@
     - docker-ce-{{ rhel_docker_ce_version }}
     - docker-ce-cli-{{ rhel_docker_ce_cli_version }}
     state: present
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Add user to docker
   ansible.builtin.user:
@@ -59,6 +54,4 @@
     groups:
     - docker
     append: yes
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise
-    Linux'
-
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
