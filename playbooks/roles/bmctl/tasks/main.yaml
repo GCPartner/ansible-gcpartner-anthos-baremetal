@@ -9,8 +9,13 @@
     bmctl_key: "{{ lookup('file', '{{ home_path }}/bootstrap/gcp_keys/bmctl.json')\
       \ | from_json }}"
 
-- import_tasks: rhel.yaml
-- import_tasks: ubuntu.yaml
+- name: Import RedHat tasks
+  import_tasks: rhel.yaml
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+- name: Import Debian/ubuntu tasks
+  import_tasks: ubuntu.yaml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Download bmctl
   ansible.builtin.shell:

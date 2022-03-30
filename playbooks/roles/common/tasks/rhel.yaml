@@ -2,16 +2,15 @@
 - name: Disable SELinux
   ansible.posix.selinux:
     state: disabled
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
-- name: Check if firewalld service exist
-  shell: service firewalld status
-  register: firewalld_status
-  failed_when: not(firewalld_status.rc == 4 or firewalld_status.rc == 0)
+# install firewalld, then stop
+- name: Install firewalld
+  ansible.builtin.yum:
+    name: firewalld
+    state: present
 
 - name: Stop and disable firewalld service
   ansible.builtin.service:
     name: firewalld
     state: stopped
-    enabled: False
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat' and firewalld_status.rc == 0
+    enabled: false
