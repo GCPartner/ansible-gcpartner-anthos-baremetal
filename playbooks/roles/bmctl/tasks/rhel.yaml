@@ -10,9 +10,15 @@
     - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
+- name: Install Google Cloud SDK
+  ansible.builtin.yum:
+    update_cache: yes
+    pkg:
+    - google-cloud-sdk
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 # Using https://docs.docker.com/engine/install/centos/
-- name: Remove old versions
+- name: Remove old docker versions
   ansible.builtin.yum:
     name:
     - docker
@@ -24,6 +30,13 @@
     - docker-logrotate
     - docker-engine
     state: absent
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+- name: Install Docker prerequisites
+  ansible.builtin.yum:
+    name:
+    - iptables
+    state: present
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Add yum-utils
