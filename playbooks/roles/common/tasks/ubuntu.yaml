@@ -8,3 +8,4 @@
 - name: Disable UFW
   community.general.ufw:
     state: disabled
+  when: ansible_distribution == 'Ubuntu'
