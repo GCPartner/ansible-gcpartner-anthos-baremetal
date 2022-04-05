@@ -61,7 +61,7 @@
 - name: Create cluster
   ansible.builtin.shell:
     chdir: '{{ home_path }}/bootstrap'
-    cmd: 'timeout 1200 {{ home_path }}/bootstrap/bmctl create cluster -c {{ cluster_name }} &>
+    cmd: '/usr/bin/timeout 1200 {{ home_path }}/bootstrap/bmctl create cluster -c {{ cluster_name }} &>
       {{ home_path }}/bootstrap/cluster_create.log'
     creates: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
       }}-kubeconfig'
