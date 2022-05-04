@@ -41,6 +41,7 @@
   ansible.builtin.file:
     path: '{{ home_path }}/bootstrap/bmctl'
     mode: '0755'
+
 - name: Create cluster config
   ansible.builtin.shell:
     chdir: '{{ home_path }}/bootstrap'
@@ -56,8 +57,8 @@
     src: bmctl.conf.j2
     dest: '{{ home_path }}/bootstrap/bmctl-workspace/{{ cluster_name }}/{{ cluster_name
       }}.yaml'
+    mode: '0644'
 
-# task to create
 - name: Create cluster
   ansible.builtin.shell:
     chdir: '{{ home_path }}/bootstrap'
