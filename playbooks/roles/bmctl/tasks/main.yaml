@@ -85,4 +85,4 @@
     dest: '{{ home_path }}/.kube/config'
     owner: '{{ username }}'
     group: '{{ username }}'
-    mode: '0644'
+    mode: '0600'
