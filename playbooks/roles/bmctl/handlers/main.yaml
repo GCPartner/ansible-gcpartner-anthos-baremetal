@@ -6,13 +6,13 @@
     mode: '0755'
   listen: Create Removed Taint Fact
 
-- name: Create Removed Taint Fact
+- name: Check if remove_taint Fact exists
   ansible.builtin.stat:
     path: /etc/ansible/facts.d/remove_taint.fact
   register: remove_taint
   listen: Create Removed Taint Fact
 
-- name: Find unused disk
+- name: Create remove_taint fact file
   community.general.ini_file:
     path: /etc/ansible/facts.d/remove_taint.fact
     section: general
